@@ -8,7 +8,6 @@ on:
 jobs:
   delete-merged-branches:
     runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].message, 'merge release/all into master')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
