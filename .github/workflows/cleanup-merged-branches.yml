@@ -16,6 +16,15 @@ jobs:
 
       - name: Delete merged branches
         run: |
-          git fetch origin release/all:release/all
-          git branch --merged release/all | grep -v '^\*' | grep -v 'release/all' | grep -v 'master' | xargs -n 1 git branch -d
-          git branch -r --merged release/all | grep -v 'origin/release/all' | grep -v 'origin/master' | sed 's/origin\///' | xargs -n 1 -I {} git push origin --delete {}
+          git fetch --prune
+          git checkout release/all
+          git pull
+          # List branches merged into release/all, excluding release/all and master
+          for branch in $(git branch --merged | grep -vE '^\*|release/all|master'); do
+            # Ensure the branch is not currently checked out
+            git checkout master
+            # Delete the branch locally
+            git branch -d $branch
+            # Delete the branch on the remote
+            git push origin --delete $branch
+          done
