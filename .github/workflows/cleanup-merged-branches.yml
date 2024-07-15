@@ -1,4 +1,4 @@
-name: Delete Merged Branches on Release Merge
+name: Delete Merged Branches
 
 on:
   push:
@@ -16,15 +16,12 @@ jobs:
 
       - name: Delete merged branches
         run: |
-          git fetch --prune
-          git checkout release/all
-          git pull
-          # List branches merged into release/all, excluding release/all and master
-          for branch in $(git branch --merged | grep -vE '^\*|release/all|master'); do
-            # Ensure the branch is not currently checked out
-            git checkout master
-            # Delete the branch locally
-            git branch -d $branch
-            # Delete the branch on the remote
-            git push origin --delete $branch
+          git fetch --prune --all
+          merged_branches=$(git branch --merged master | grep -v 'master$' | xargs)
+          echo "Merged branches: $merged_branches"
+          for branch in $merged_branches; do
+            if [[ "$branch" != "release/all" ]]; then
+              git push origin --delete "$branch"
+              echo "Deleted branch: $branch"
+            fi
           done
