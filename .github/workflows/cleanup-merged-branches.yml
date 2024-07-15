@@ -15,15 +15,11 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
       - name: Delete merged branches in release/all
         run: |
-          # Check if release/all was merged into master
-          MERGED=$(git log -1 --pretty=format:%s)
-          if [[ $MERGED == *"Merge branch 'release/all' into master"* ]]; then
-            # Fetch all branches
-            git fetch --prune
-            # Loop through each branch and delete if merged into release/all, excluding release/all itself
-            for branch in $(git branch -r --merged release/all | grep -vE 'release/all$'); do
-              git push origin --delete ${branch#origin/}
-            done
-          else
-            echo "release/all was not merged into master. No branches deleted."
-          fi
+          git fetch --prune
+          echo "Branches merged into release/all:"
+          git branch -r --merged release/all | grep -vE 'release/all$'
+          # Loop through each branch and delete if merged into release/all, excluding release/all itself
+          for branch in $(git branch -r --merged release/all | grep -vE 'release/all$'); do
+            echo "Deleting branch: ${branch#origin/}"
+            git push origin --delete ${branch#origin/}
+          done
