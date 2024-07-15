@@ -1,4 +1,4 @@
-name: Cleanup Merged Branches
+name: Delete Merged Branches
 
 on:
   push:
@@ -8,16 +8,18 @@ on:
 jobs:
   delete-branches:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Cleanup merged branches
+      - name: Delete merged branches
         run: |
-          git fetch --prune
-          git for-each-ref --format='%(refname:short)' refs/heads | while read branch; do
-            if [ "$branch" != "master" ] && [ "$(git merge-base --is-ancestor $branch release/all; echo $?)" -eq 0 ]; then
-              git push --delete origin $branch
+          git fetch --prune --all
+          merged_branches=$(git branch --merged master | grep -v 'master$' | xargs)
+          echo "Merged branches: $merged_branches"
+          for branch in $merged_branches; do
+            if [[ "$branch" != "release/all" ]]; then
+              git push origin --delete "$branch"
+              echo "Deleted branch: $branch"
             fi
           done
