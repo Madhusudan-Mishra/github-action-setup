@@ -1,4 +1,4 @@
-name: Delete Merged Branches
+name: Cleanup Merged Branches on Release Merge
 
 on:
   push:
@@ -6,22 +6,23 @@ on:
       - master
 
 jobs:
-  delete-merged-branches:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
-
-      - name: Delete merged branches
+          fetch-depth: 0 # Ensure all history is fetched
+      - name: Delete merged branches in release/all
         run: |
-          git fetch --prune --all
-          merged_branches=$(git branch --merged master | grep -v 'master$' | xargs)
-          echo "Merged branches: $merged_branches"
-          for branch in $merged_branches; do
-            if [[ "$branch" != "release/all" ]]; then
-              git push origin --delete "$branch"
-              echo "Deleted branch: $branch"
-            fi
-          done
+          # Check if release/all was merged into master
+          MERGED=$(git log -1 --pretty=format:%s)
+          if [[ $MERGED == *"Merge branch 'release/all' into master"* ]]; then
+            # Fetch all branches
+            git fetch --prune
+            # Loop through each branch and delete if merged into release/all, excluding release/all itself
+            for branch in $(git branch -r --merged release/all | grep -vE 'release/all$'); do
+              git push origin --delete ${branch#origin/}
+            done
+          else
+            echo "release/all was not merged into master. No branches deleted."
+          fi
