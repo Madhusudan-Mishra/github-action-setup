@@ -17,7 +17,7 @@ jobs:
         run: |
           git fetch --prune
           echo "Branches merged into release/all:"
-          git branch -r --merged release/all | grep -vE 'release/all$' || { echo "No branches to delete."; exit 0; }
+          git branch -r --merged release/all|| { echo "No branches to delete."; exit 0; }
           for branch in $(git branch -r --merged release/all | grep -vE 'release/all$'); do
             branch_name=${branch#origin/}
             echo "Attempting to delete branch: $branch_name"
