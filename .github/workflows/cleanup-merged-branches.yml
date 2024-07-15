@@ -17,9 +17,9 @@ jobs:
         run: |
           git fetch --prune
           echo "Branches merged into release/all:"
-          git branch -r --merged release/all | grep -vE 'release/all$'
-          # Loop through each branch and delete if merged into release/all, excluding release/all itself
+          git branch -r --merged release/all | grep -vE 'release/all$' || { echo "No branches to delete."; exit 0; }
           for branch in $(git branch -r --merged release/all | grep -vE 'release/all$'); do
-            echo "Deleting branch: ${branch#origin/}"
-            git push origin --delete ${branch#origin/}
+            branch_name=${branch#origin/}
+            echo "Attempting to delete branch: $branch_name"
+            git push origin --delete "$branch_name" || echo "Failed to delete $branch_name. It might be protected or already deleted."
           done
