@@ -12,8 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Ensure all history is fetched
-      - name: Fetch release/all branch explicitly
-        run: git fetch origin release/all:release/all
+          token: ${{ secrets.ACTION_TOKEN }}
       - name: List all remote branches
         run: git branch -r
       - name: Delete merged branches in release/all
