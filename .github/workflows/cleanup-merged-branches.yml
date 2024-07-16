@@ -1,4 +1,4 @@
-name: Cleanup Merged Branches on Release Merge
+name: Cleanup Merged Branches on Release Merge validate Token Permission
 
 on:
   push:
