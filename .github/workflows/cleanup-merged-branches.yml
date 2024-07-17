@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Ensure all history is fetched
-          token: ${{ secrets.GITHUB_TOKEN  }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Fetch release/all branch explicitly
         run: git fetch origin release/all:release/all
       - name: List all remote branches
