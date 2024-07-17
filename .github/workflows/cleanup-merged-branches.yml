@@ -1,9 +1,12 @@
-name: Cleanup Merged Branches on Release Merge validate Token Permission
+name: Cleanup Merged Branches via Github Token
 
 on:
   push:
     branches:
       - master
+
+permissions:
+  contents: write
 
 jobs:
   cleanup:
